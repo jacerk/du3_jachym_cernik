@@ -12,7 +12,7 @@ def Pythagoras(x1, y1, x2, y2):
   return float(sqrt((x2 - x1)**2 + (y2 - y1)**2))
 
 # Prompt the user for the paths to the input files
-usedefault = input("Do you want to use your own paths for geojson files, Write YES (ALL CAPITAL) if you do: ")
+usedefault = input("Do you want to use default geojson files, Write YES (ALL CAPITAL) if you do, else choose your own GeoJson files")
 if usedefault == "YES":
     addresses_path = 'adresy.geojson'
     containers_path = 'kontejnery.geojson'
@@ -121,7 +121,6 @@ hn = data_addresess["features"][find_index]["properties"]["addr:housenumber"]
 print("Loaded")
 print("Average: {}".format(round(mean(distances),1)))        
 print("Median: {}".format(round(median(distances),1)))
-print("Furthest distance from a container is {max_distance} m, at {adresa} {cd}".format(max_distance = max(distances),adresa = data_addresess["features"][find_index]["properties"]["addr:street"],cd = data_addresess["features"][find_index]["properties"]["addr:housenumber"]))
 print("Furthest distance from a container is {} m, at {} {}".format(max_distance,address,hn))
 
 
