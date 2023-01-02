@@ -106,19 +106,23 @@ try:
         
 except KeyError:
     sys.exit("Files is missing required attributes")
+# makes another file with distances and adresses joined and its dumped there by using the values list 
 with open("adresy_kontejnery.geojson","w", encoding="utf-8") as out:
     json.dump(values, out, ensure_ascii = False, indent = 2)
 
 distances = [adress["properties"]["closest_bin"] for adress in data_addresess["features"]]
 
 find_index = (distances.index(max(distances)))
-        
+
+# results
+max_distance = max(distances)
+address = data_addresess["features"][find_index]["properties"]["addr:street"]
+hn = data_addresess["features"][find_index]["properties"]["addr:housenumber"]
 print("Loaded")
 print("Average: {}".format(round(mean(distances),1)))        
-
 print("Median: {}".format(round(median(distances),1)))
-print("Furthest from the container is {max_distance} m is the entry at {adresa} {cd}".format(max_distance = max(distances),adresa = data_addresess["features"][find_index]["properties"]["addr:street"],cd = data_addresess["features"][find_index]["properties"]["addr:housenumber"]))
-
+print("Furthest distance from a container is {max_distance} m, at {adresa} {cd}".format(max_distance = max(distances),adresa = data_addresess["features"][find_index]["properties"]["addr:street"],cd = data_addresess["features"][find_index]["properties"]["addr:housenumber"]))
+print("Furthest distance from a container is {} m, at {} {}".format(max_distance,address,hn))
 
 
 
