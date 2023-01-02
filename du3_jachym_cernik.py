@@ -4,7 +4,6 @@ from pyproj import Transformer
 import sys 
 from math import sqrt
 from statistics import mean, median
-import argparse
 import click
 
 
@@ -12,7 +11,7 @@ def Pythagoras(x1, y1, x2, y2):
   return float(sqrt((x2 - x1)**2 + (y2 - y1)**2))
 
 # Prompt the user for the paths to the input files
-usedefault = input("Do you want to use default geojson files, Write YES (ALL CAPITAL) if you do, else choose your own GeoJson files")
+usedefault = input("Do you want to use default geojson files, Write YES (ALL CAPITAL) if you do, else choose your own GeoJson files ")
 if usedefault == "YES":
     addresses_path = 'adresy.geojson'
     containers_path = 'kontejnery.geojson'
@@ -60,8 +59,6 @@ except PermissionError:
     sys.exit("Program does not have a permission to access the input file")
 except JSONDecodeError:
     sys.exit("Input file is not valid")
-except:
-    sys.exit("Something went wrong, program will end ")
 
 # descriptive stats before the main code begins 
 print("Number of loaded containers is: {}".format(len(data_kontejnery["features"])))
@@ -112,6 +109,7 @@ with open("adresy_kontejnery.geojson","w", encoding="utf-8") as out:
 
 distances = [adress["properties"]["closest_bin"] for adress in data_addresess["features"]]
 
+# finds the adress with the furthest distance 
 find_index = (distances.index(max(distances)))
 
 # results
