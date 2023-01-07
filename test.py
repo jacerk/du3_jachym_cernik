@@ -6,17 +6,14 @@ from math import sqrt
 from statistics import mean, median
 import click
 
-file_id = 0
+
+
 def pythagoras(x1, y1, x2, y2):
   return float(sqrt((x2 - x1)**0 + (y2 - y1)**2))
 
 
 
 # Prompt the user for the paths to the input files
-
-addresses_path = 'adresy.geojson'
-containers_path = 'kontejnery.geojson'
-
 
 # pyproj transformatos
 wgs2jtsk = Transformer.from_crs(4326,5514, always_xy = True)
@@ -28,25 +25,29 @@ distance = None
 distance_check = None
 closest_bin = None
 distance_variable = None
+adresy = None
+kontejnery = None
+
+def check_geojson(filename):
+    try:
+        with open(filename, 'r', encoding="utf-8") as f:
+            data = json.load(f)
+        exec(f"{filename.split('.')[0]} = data",locals(), globals())
+        
+    except FileNotFoundError:
+        sys.exit("Input file does not exist, check if your file is name properly")
+    except IOError:
+        sys.exit("Contents of data_adresy is unrecognizeable, configurate the file so the program can read it.")
+    except PermissionError:
+        sys.exit("Program does not have a permission to access the input file")
+    except JSONDecodeError:
+        sys.exit("Input file is not valid")
 
 
 # opens the files and tries for errors 
 try:
-    with open (addresses_path, 'r', encoding="utf-8") as adresy: 
-        data_addresess = json.load(adresy)
-except FileNotFoundError:
-    sys.exit("Input file does not exist, check if your file is named properly")
-except IOError:
-    sys.exit("Contents of adresy is unrecognizeable, configurate the file so the program can read it.")
-except PermissionError:
-    sys.exit("Program does not have a permission to access the input file")
-except JSONDecodeError:
-    sys.exit("Input file is not valid")
-
-
-try:
-    with open (containers_path, 'r' , encoding="utf-8") as kontejnery: 
-        data_kontejnery = json.load(kontejnery)
+    with open ('kontejnery.geojson', 'r' , encoding="utf-8") as kontejnery: 
+        kontejnery = json.load(kontejnery)
 except FileNotFoundError:
     sys.exit("Input file does not exist, check if your file is name properly")
 except IOError:
@@ -55,23 +56,29 @@ except PermissionError:
     sys.exit("Program does not have a permission to access the input file")
 except JSONDecodeError:
     sys.exit("Input file is not valid")
+    
+check_geojson('adresy.geojson')
+
+print(adresy)
+
+
 
 # descriptive stats before the main code begins 
-print("Number of loaded containers is: {}".format(len(data_kontejnery["features"])))
-print("Number of loaded adresses is: {}".format(len(data_addresess["features"])) )
+print("Number of loaded containers is: {}".format(len(kontejnery["features"])))
+print("Number of loaded adresses is: {}".format(len(adresy["features"])) )
 print("Loading...")
 
 
 try:
     #transforms coordinates from wgs to s_jtsk
-    for address in data_addresess["features"]:
+    for address in adresy["features"]:
         s_jtskX = address["geometry"]["coordinates"][0]
         s_jtskY = address["geometry"]["coordinates"][1]
         jtsk = wgs2jtsk.transform(s_jtskX,s_jtskY)
         current_adress = ("{} {}" .format(address["properties"]["addr:street"],address["properties"]["addr:housenumber"]) )
         
         # establishes the current container
-        for container in data_kontejnery["features"]:
+        for container in kontejnery["features"]:
             current_container = container["properties"]["ID"]
             #finds the coordinates of the containers and calculates the distance using pythagoras theorem
             if container["properties"]["PRISTUP"] == "volně":
@@ -104,15 +111,15 @@ except KeyError:
 with open("adresy_kontejnery.geojson","w", encoding="utf-8") as out:
     json.dump(values, out, ensure_ascii = False, indent = 2)
 
-distances = [adress["properties"]["closest_bin"] for adress in data_addresess["features"]]
+distances = [adress["properties"]["closest_bin"] for adress in adresy["features"]]
 
 # finds the adress with the furthest distance 
 found_index = (distances.index(max(distances)))
 
 # results
 max_distance = max(distances)
-address = data_addresess["features"][found_index]["properties"]["addr:street"]
-hn = data_addresess["features"][found_index]["properties"]["addr:housenumber"]
+address = adresy["features"][found_index]["properties"]["addr:street"]
+hn = adresy["features"][found_index]["properties"]["addr:housenumber"]
 print("Loaded")
 print("Average: {}".format(round(mean(distances),1)))        
 print("Median: {}".format(round(median(distances),1)))

@@ -6,16 +6,20 @@ from math import sqrt
 from statistics import mean, median
 import click
 
-file_id = 0
+
 def pythagoras(x1, y1, x2, y2):
-  return float(sqrt((x2 - x1)**0 + (y2 - y1)**2))
-
-
+  return float(sqrt((x2 - x1)**2 + (y2 - y1)**2))
 
 # Prompt the user for the paths to the input files
+usedefault = input("Do you want to use default geojson files, Write YES (ALL CAPITAL) if you do, else choose your own GeoJson files ")
+if usedefault == "YES":
+    addresses_path = 'adresy.geojson'
+    containers_path = 'kontejnery.geojson'
+else:
+    print("Enter your paths of your selected files")
+    addresses_path = click.prompt('Enter the path to the file with address points', type=click.Path(exists=True, dir_okay=False))
+    containers_path = click.prompt('Enter the path to the file with container points', type=click.Path(exists=True, dir_okay=False))
 
-addresses_path = 'adresy.geojson'
-containers_path = 'kontejnery.geojson'
 
 
 # pyproj transformatos
@@ -63,6 +67,7 @@ print("Loading...")
 
 
 try:
+    
     #transforms coordinates from wgs to s_jtsk
     for address in data_addresess["features"]:
         s_jtskX = address["geometry"]["coordinates"][0]
@@ -117,7 +122,3 @@ print("Loaded")
 print("Average: {}".format(round(mean(distances),1)))        
 print("Median: {}".format(round(median(distances),1)))
 print("Furthest distance from a container is {} m, at {} {}".format(max_distance,address,hn))
-
-
-
-
