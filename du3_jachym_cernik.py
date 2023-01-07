@@ -7,7 +7,7 @@ from statistics import mean, median
 import click
 
 
-def Pythagoras(x1, y1, x2, y2):
+def pythagoras(x1, y1, x2, y2):
   return float(sqrt((x2 - x1)**2 + (y2 - y1)**2))
 
 # Prompt the user for the paths to the input files
@@ -81,7 +81,7 @@ try:
             if container["properties"]["PRISTUP"] == "volně":
                 co_x = container["geometry"]["coordinates"][0]
                 co_y = container["geometry"]["coordinates"][1]
-                distance = Pythagoras(jtsk[0] ,jtsk[1] ,co_x , co_y)
+                distance = pythagoras(jtsk[0] ,jtsk[1] ,co_x , co_y)
                 # helps find the furthest container by comparing it to the past values in distance variable 
                 if distance_variable == None or distance_variable > distance:
                     distance_variable = distance
@@ -95,6 +95,7 @@ try:
         # if the containers are further than 10000 meters then the program stops 
         if distance_variable > 10000:
             raise Exception("Containers are way too far away")
+            exit()
         # at the end of each cycle the program creaes new feature for closest container
         address["properties"]["closest_bin"] = round(distance_variable) 
         address["properties"]["container"] = closest_bin
@@ -110,12 +111,12 @@ with open("adresy_kontejnery.geojson","w", encoding="utf-8") as out:
 distances = [adress["properties"]["closest_bin"] for adress in data_addresess["features"]]
 
 # finds the adress with the furthest distance 
-find_index = (distances.index(max(distances)))
+found_index = (distances.index(max(distances)))
 
 # results
 max_distance = max(distances)
-address = data_addresess["features"][find_index]["properties"]["addr:street"]
-hn = data_addresess["features"][find_index]["properties"]["addr:housenumber"]
+address = data_addresess["features"][found_index]["properties"]["addr:street"]
+hn = data_addresess["features"][found_index]["properties"]["addr:housenumber"]
 print("Loaded")
 print("Average: {}".format(round(mean(distances),1)))        
 print("Median: {}".format(round(median(distances),1)))
