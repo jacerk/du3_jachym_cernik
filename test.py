@@ -7,11 +7,8 @@ from statistics import mean, median
 import click
 
 
-
 def pythagoras(x1, y1, x2, y2):
-  return float(sqrt((x2 - x1)**0 + (y2 - y1)**2))
-
-
+  return float(sqrt((x2 - x1)**2 + (y2 - y1)**2))
 
 # Prompt the user for the paths to the input files
 
@@ -21,19 +18,20 @@ jtsk2wgs = Transformer.from_crs(5514,4326, always_xy = True)
 
 # variables
 values = [] 
+filenames = {}
 distance = None
 distance_check = None
 closest_bin = None
 distance_variable = None
+
 adresy = None
 kontejnery = None
-
 def check_geojson(filename):
+    global data
     try:
         with open(filename, 'r', encoding="utf-8") as f:
             data = json.load(f)
-        exec(f"{filename.split('.')[0]} = data",locals(), globals())
-        
+
     except FileNotFoundError:
         sys.exit("Input file does not exist, check if your file is name properly")
     except IOError:
@@ -42,32 +40,24 @@ def check_geojson(filename):
         sys.exit("Program does not have a permission to access the input file")
     except JSONDecodeError:
         sys.exit("Input file is not valid")
+    
 
 
 # opens the files and tries for errors 
-try:
-    with open ('kontejnery.geojson', 'r' , encoding="utf-8") as kontejnery: 
-        kontejnery = json.load(kontejnery)
-except FileNotFoundError:
-    sys.exit("Input file does not exist, check if your file is name properly")
-except IOError:
-    sys.exit("Contents of data_adresy is unrecognizeable, configurate the file so the program can read it.")
-except PermissionError:
-    sys.exit("Program does not have a permission to access the input file")
-except JSONDecodeError:
-    sys.exit("Input file is not valid")
-    
-check_geojson('adresy.geojson')
 
-print(adresy)
+    
+check_geojson("adresy.geojson")
+adresy = data
+check_geojson("kontejnery.geojson")
+kontejnery = data
+
 
 
 
 # descriptive stats before the main code begins 
-print("Number of loaded containers is: {}".format(len(kontejnery["features"])))
-print("Number of loaded adresses is: {}".format(len(adresy["features"])) )
+print("Number of loaded containers is: {}".format(len(adresy["features"])))
+print("Number of loaded adresses is: {}".format(len(kontejnery["features"])))
 print("Loading...")
-
 
 try:
     #transforms coordinates from wgs to s_jtsk
