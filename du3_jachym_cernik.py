@@ -4,7 +4,19 @@ from pyproj import Transformer
 import sys 
 from math import sqrt
 from statistics import mean, median
-import click
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-a', type = str)
+parser.add_argument('-k', type = str )
+
+args = parser.parse_args()
+
+addresses_path = args.a if args.a else None
+containers_path = args.k if args.k else None
+
+
 
 
 def pythagoras(x1, y1, x2, y2):
@@ -45,11 +57,29 @@ def check_geojson(filename):
 
 # opens the files and tries for errors 
 
+
+if args.a:
+    check_geojson(args.a)
+    adresy = data
+    print("true")
+else:
+    check_geojson("adresy.geojson")
+    adresy = data
+    print("false")
+if args.k:
+    check_geojson(args.a)
+    kontejnery = data
+    print("true")
+else:
+    check_geojson("kontejnery.geojson")
+    kontejnery = data
+    print("false")
+
+
+
+
     
-check_geojson("adresy.geojson")
-adresy = data
-check_geojson("kontejnery.geojson")
-kontejnery = data
+    
 
 
 
